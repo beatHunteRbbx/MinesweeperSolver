@@ -62,7 +62,7 @@ public class Solver {
         if (cell == null) click();
         else if (!cell.value.equals("0")) {
             cell.camoView.setVisible(false);
-            cell.isOpened = true;
+//            cell.isOpened = true;
             if (cell.value.equals("*")) {
                 gameField.lose();
                 return;
@@ -71,7 +71,7 @@ public class Solver {
         }
         else {
             cell.camoView.setVisible(false);
-            cell.isOpened = true;
+//            cell.isOpened = true;
         }
     }
     public void createGroups() {
@@ -128,8 +128,8 @@ public class Solver {
                         largerGroup.removeGroup(smallerGroup);
                         repeat = true;
                     }
-                    else if (group.intersects(groupToCompare)) {
-                        if (group.getMinesNumber() > groupToCompare.getMinesNumber()) {
+                    else if (group.intersects(groupToCompare)) {   //если группы пересекаются
+                        if (group.getMinesNumber() > groupToCompare.getMinesNumber()) {   //определяем большую группу по количеству мин
                             largerGroup = group;
                             smallerGroup = groupToCompare;
                         }
