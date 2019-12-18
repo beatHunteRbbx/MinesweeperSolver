@@ -33,7 +33,6 @@ public class GameField {
         createMines();
         buildField();
         calcMinesAround();
-        System.out.println();
         show(arrField);
         run();
     }
@@ -232,8 +231,11 @@ public class GameField {
                         }
                     }
                 }
-                if (cellsWithMinesList.equals(closedCellsList)) {
-                    for (Cell cell : cellsWithMinesList) cell.flagView.setVisible(true);
+                if (cellsWithMinesList.containsAll(closedCellsList)) {
+                    for (Cell cell : cellsWithMinesList) {
+                        cell.flagView.setVisible(true);
+//                        victory();
+                    }
                 }
 
 //                System.out.println("cellsWithMinesList.size()) " + cellsWithMinesList.size());
@@ -271,8 +273,12 @@ public class GameField {
                     if (!flagImageView.isVisible()) {
                         if (event.getButton() == MouseButton.PRIMARY) {
                             currentCell.camoView.setVisible(false);
+                            currentCell.isOpened = true;
                             if (currentCell.hasMine) {
-                                for (Cell cell : cellsWithMinesList) cell.camoView.setVisible(false);
+                                for (Cell cell : cellsWithMinesList) {
+                                    cell.camoView.setVisible(false);
+                                    cell.isOpened = true;
+                                }
                                 lose();
                             }
                         }
@@ -307,6 +313,22 @@ public class GameField {
     public void lose() {
         System.out.println("Вы проиграли");
         gridPane.setDisable(true);
+        Main.solveButton.setDisable(true);
+    }
+
+    public void victory() {
+        System.out.println("Вы выиграли");
+        gridPane.setDisable(true);
+    }
+
+    public List<Cell> getCellNeighbours(Cell cell) {
+        List<Cell> neighboursList = new ArrayList<>();
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                neighboursList.add(arrCells[cell.i + i][cell.j + j]);
+            }
+        }
+        return neighboursList;
     }
 }
 
