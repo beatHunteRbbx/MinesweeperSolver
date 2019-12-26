@@ -18,19 +18,19 @@ public class Group {
     private List<Cell> members = new ArrayList<>();
     private int minesNumber;
 
-    public int getMinesNumber() {
+    int getMinesNumber() {
         return minesNumber;
     }
 
-    public List<Cell> getMembers() {
+    List<Cell> getMembers() {
         return members;
     }
 
-    public void setMinesNumber(int minesNumber) {
+    void setMinesNumber(int minesNumber) {
         this.minesNumber = minesNumber;
     }
 
-    public void add(Cell cell) {
+    void add(Cell cell) {
         members.add(cell);
     }
 
@@ -38,11 +38,11 @@ public class Group {
         members.remove(cell);
     }
 
-    public int size() {
+    int size() {
         return members.size();
     }
 
-    public boolean intersects(Group group) {
+    boolean intersects(Group group) {
         boolean hasIntersects = false;
         for (Cell cell : group.members) {
             if (this.members.contains(cell)) {
@@ -52,55 +52,27 @@ public class Group {
         }
         if (hasIntersects) return true;
         else return false;
-//        for (Cell cell : group.members) if (!members.contains(cell)) return false;
-//        return true;
     }
 
-    public Group getIntersect(Group group) {
-//        Group localGroup1 = new Group(new ArrayList<>(this.getMembers()), this.getMinesNumber());
-//        Group localGroup2 = new Group(new ArrayList<>(group.getMembers()), group.getMinesNumber());
-
+    Group getIntersect(Group group) {
         Group intersectGroup = new Group();
         for (Cell cell : group.getMembers()) {
             if (this.getMembers().contains(cell)) {
                 intersectGroup.add(cell);
             }
         }
-//        Group largerGroup;
-//        Group smallerGroup;
-//
-//        if (this.getMinesNumber() >= group.getMinesNumber()) {
-//            largerGroup = this;
-//            smallerGroup = group;
-////            intersectGroup.setMinesNumber(this.getMinesNumber() - group.size());
-//        }
-//        else {
-//            largerGroup = group;
-//            smallerGroup = this;
-////            intersectGroup.setMinesNumber(group.getMinesNumber() - this.size());
-//        }
-//
-//
-//        intersectGroup.setMinesNumber(this.getMinesNumber() - group.size());
-
         intersectGroup.setMinesNumber(minesNumber - (this.size() - intersectGroup.size()));
-//        intersectGroup.setMinesNumber(this.size() - (group.size() - intersectGroup.size()) - minesNumber);
-//        if (intersectGroup.getMinesNumber() < 0) intersectGroup.setMinesNumber(1);
         if (intersectGroup.getMinesNumber() != group.getMinesNumber()) return null;
         return intersectGroup;
     }
 
-//    public void removeGroup(Group group) {
-//        for (Cell member : group.getMembers()) this.getMembers().remove(member);
-//    }
-
-    public List<Double> getProbabilities() {
+    List<Double> getProbabilities() {
         List<Double> probList = new ArrayList<>();
         for (Cell cell : members) probList.add(cell.getProbability());
         return probList;
     }
 
-    public void substract(Group group) {
+    void subtract(Group group) {
         for (Cell member : group.getMembers()) this.members.remove(member);
         this.minesNumber -= group.minesNumber;
     }

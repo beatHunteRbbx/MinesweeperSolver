@@ -16,27 +16,27 @@ import solver.Solver;
 
 public class Main extends Application {
 
-    static Scene playScene;
-    static Stage mainWindow = new Stage();
+    private static Scene playScene;
+    private static Stage mainWindow = new Stage();
     public static Thread mainThread;
-    static Button beginButton = new Button("Begin");
+    private static Button beginButton = new Button("Begin");
     static Button solveButton = new Button("Solve");
-    static Button restartButton = new Button("Restart");
-    GameField gameField;
-    static GridPane gridPane;
-    static GridPane visibleGridPane;
-    RadioButton autoSolveRadioButton = new RadioButton("Auto Solver");
-    RadioButton stepByStepSolveRadioButton = new RadioButton("Step-By-Step Solver");
-    ToggleGroup radioButtonsGroup = new ToggleGroup();
+    private static Button restartButton = new Button("Restart");
+    private GameField gameField;
+    private static GridPane gridPane;
+    private static GridPane visibleGridPane;
+    private RadioButton autoSolveRadioButton = new RadioButton("Auto Solver");
+    private RadioButton stepByStepSolveRadioButton = new RadioButton("Step-By-Step Solver");
+    private ToggleGroup radioButtonsGroup = new ToggleGroup();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 
-        int rows = 4;
-        int columns = 4;
-//        int maxNumberOfMines = (rows + columns) / 2;
-        int maxNumberOfMines = 3;
+        int rows = 10;
+        int columns = 10;
+        int maxNumberOfMines = (rows + columns) / 2;
+
 
         Runnable mainTask = new Runnable() {
             @Override
@@ -66,7 +66,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    public void initialiseField(int rows, int columns, int maxNumberOfMines) {
+    private void initialiseField(int rows, int columns, int maxNumberOfMines) {
 
         mainWindow.setMinWidth(columns * 2 * Images.imageW + 150);
         mainWindow.setMinHeight(rows * Images.imageH + 100);

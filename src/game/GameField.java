@@ -17,20 +17,20 @@ public class GameField {
 
     //карта расставленных мин, содержащая нули и единицы, чтобы было удобно расчитывать
     //количество мин рядом с ячейкой и присваивать вычисленное значение ячейке.
-    public Integer[][] arrMines;
+    private Integer[][] arrMines;
 
     public Cell[][] arrCells;
 
 
-    public List<Mine> listOfMines = new ArrayList<>();
+    private List<Mine> listOfMines = new ArrayList<>();
 
-    public List<Cell> markedCellsList = new ArrayList<>();
-    public List<Cell> cellsWithMinesList = new ArrayList<>();
-    public List<Cell> closedCellsList = new ArrayList<>();
+    private List<Cell> markedCellsList = new ArrayList<>();
+    private List<Cell> cellsWithMinesList = new ArrayList<>();
+    private List<Cell> closedCellsList = new ArrayList<>();
 
-    GridPane gridPane;
+    private GridPane gridPane;
 
-    public void initialize() {
+    void initialize() {
         createMines();
         buildField();
         calcMinesAround();
@@ -82,7 +82,7 @@ public class GameField {
         }
     }
 
-    public void calcMinesAround() {
+    private void calcMinesAround() {
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
                 if (arrMines[i][j] == 0) {
@@ -127,7 +127,7 @@ public class GameField {
         }
     }
 
-    public void buildField() {
+    private void buildField() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 arrMines[i][j] = 0;
@@ -137,7 +137,7 @@ public class GameField {
         for (Mine mine : listOfMines) arrMines[mine.getI()][mine.getJ()] = 1;
     }
 
-    public void draw(Pane playPane) {
+    void draw(Pane playPane) {
 
         gridPane = new GridPane();
         gridPane.setStyle("-fx-background-color: grey");
@@ -241,7 +241,7 @@ public class GameField {
         }
     }
 
-    public void run() {
+    private void run() {
         AnimationTimer animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -276,7 +276,7 @@ public class GameField {
         animationTimer.start();
     }
 
-    public void startGameProcess() {
+    void startGameProcess() {
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
                 Cell currentCell = arrCells[i][j];
@@ -341,21 +341,6 @@ public class GameField {
             }
         }
         Main.mainThread.interrupt();
-    }
-
-    public void victory() {
-        System.out.println("Вы выиграли");
-        gridPane.setDisable(true);
-    }
-
-    public List<Cell> getCellNeighbours(Cell cell) {
-        List<Cell> neighboursList = new ArrayList<>();
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                neighboursList.add(arrCells[cell.getI() + i][cell.getJ() + j]);
-            }
-        }
-        return neighboursList;
     }
 }
 

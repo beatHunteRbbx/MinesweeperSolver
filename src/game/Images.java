@@ -25,19 +25,19 @@ public class Images {
     static Image GREY_IMAGE;
     static Image CAMO_IMAGE;
 
-    static ImageView MINE_IMAGEVIEW;
-    static ImageView FLAG_IMAGEVIEW;
-    static ImageView ONE_IMAGEVIEW;
-    static ImageView TWO_IMAGEVIEW;
-    static ImageView THREE_IMAGEVIEW;
-    static ImageView FOUR_IMAGEVIEW;
-    static ImageView FIVE_IMAGEVIEW;
-    static ImageView SIX_IMAGEVIEW;
-    static ImageView SEVEN_IMAGEVIEW;
-    static ImageView EIGHT_IMAGEVIEW;
-    static ImageView NINE_IMAGEVIEW;
-    static ImageView GREY_IMAGEVIEW;
-    static ImageView CAMO_IMAGEVIEW;
+    private static ImageView MINE_IMAGEVIEW;
+    private static ImageView FLAG_IMAGEVIEW;
+    private static ImageView ONE_IMAGEVIEW;
+    private static ImageView TWO_IMAGEVIEW;
+    private static ImageView THREE_IMAGEVIEW;
+    private static ImageView FOUR_IMAGEVIEW;
+    private static ImageView FIVE_IMAGEVIEW;
+    private static ImageView SIX_IMAGEVIEW;
+    private static ImageView SEVEN_IMAGEVIEW;
+    private static ImageView EIGHT_IMAGEVIEW;
+    private static ImageView NINE_IMAGEVIEW;
+    private static ImageView GREY_IMAGEVIEW;
+    private static ImageView CAMO_IMAGEVIEW;
 
     public static void load() {
         try {

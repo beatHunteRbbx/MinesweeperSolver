@@ -3,42 +3,30 @@ package solver;
 import game.Cell;
 import game.GameField;
 import game.Main;
-import game.Mine;
 import javafx.animation.AnimationTimer;
 
 import java.util.*;
 
 public class Solver {
 
-    public int maxNumberOfMines;
-    public int rows;
-    public int columns;
+    private int rows;
+    private int columns;
 
-    public String[][] arrField;
-    public Integer[][] arrMines;
-    public Cell[][] arrCells;
+    private Cell[][] arrCells;
 
-    public List<Mine> listOfMines = new ArrayList<>();
+    private List<Group> groupsList = new ArrayList<>();
+    private List<Group> filteredGroupsList = new ArrayList<>();
 
-    public List<Cell> markedCellsList = new ArrayList<>();
-    public List<Cell> cellsWithMinesList = new ArrayList<>();
-    public List<Cell> closedCellsList = new ArrayList<>();
+    private GameField gameField;
 
-    public List<Group> groupsList = new ArrayList<>();
-    public List<Group> filteredGroupsList = new ArrayList<>();
-
-    public List<Cell> doneCells = new ArrayList<>();
-    public GameField gameField;
-
-    public boolean hasLost;
-    public boolean isFirstClick;
+    private boolean hasLost;
+    private boolean isFirstClick;
 
     public Solver(GameField gameField) {
         this.gameField = gameField;
         arrCells = gameField.arrCells;
         rows = gameField.rows;
         columns = gameField.columns;
-        this.markedCellsList = gameField.markedCellsList;
         hasLost = false;
         isFirstClick = true;
     }
@@ -66,7 +54,7 @@ public class Solver {
         openCells(filteredGroupsList);
     }
 
-    public void click() {
+    private void click() {
         if (isFirstClick) {
             Random random = new Random();
             int maxForI = rows - 2;
@@ -81,7 +69,6 @@ public class Solver {
 
                 if (cell == null || cell.getFlagView().isVisible() || cell.hasMine()) {
                     click();
-                    return;
                 }
                 else if (cell.getCamoView() != null) {
                     isFirstClick = false;
@@ -120,7 +107,7 @@ public class Solver {
             }
         }
     }
-    public void createGroups() {
+    private void createGroups() {
         groupsList.clear();
 
         for (int i = 1; i < rows - 1; i++) {
@@ -161,21 +148,20 @@ public class Solver {
         }
     }
 
-    public void filterGroups(List<Group> groupsList) {
+    private void filterGroups(List<Group> groupsList) {
             filteredGroupsList.clear();
             if (groupsList.size() == 1) {
                 filteredGroupsList.addAll(groupsList);
                 return;
             }
-            boolean repeat;
-            do {
-                repeat = false;
+
+
                 for (int i = 0; i < groupsList.size() - 1; i++) { //проходим по списку групп
                     Group group = groupsList.get(i);
                     //сравниваем выбранную группу с остальными группами из списка
                     for (int j = i + 1; j < groupsList.size(); j++) {
                         Group groupToCompare = groupsList.get(j);
-                        if (groupToCompare.size() == groupToCompare.getMinesNumber()) continue;
+//                        if (groupToCompare.size() == groupToCompare.getMinesNumber()) continue;
                         if (group.equals(groupToCompare)) {
                             groupsList.remove(j--);
                             break;
@@ -192,15 +178,15 @@ public class Solver {
                             smallerGroup = group;
                         }
                         if (largerGroup.getMembers().containsAll(smallerGroup.getMembers())) {
-                            largerGroup.substract(smallerGroup);
-                            repeat = true;
+                            largerGroup.subtract(smallerGroup);
+
 //                        largerGroup.removeGroup(smallerGroup);
 //                        largerGroup.setMinesNumber(largerGroup.getMinesNumber() - smallerGroup.getMinesNumber());
 //                        Group intersectsGroup = new Group(
 //                                new ArrayList<>(largerGroup.getMembers()),
 //                                largerGroup.getMinesNumber()
 //                        );
-                            filteredGroupsList.add(largerGroup);
+//                            filteredGroupsList.add(largerGroup);
                         } else if (group.intersects(groupToCompare)) {   //если группы пересекаются
                             if (group.getMinesNumber() >= groupToCompare.getMinesNumber()) {   //определяем большую группу по количеству мин
                                 largerGroup = group;
@@ -213,14 +199,8 @@ public class Solver {
                             if (intersectGroup != null) {
                                 filteredGroupsList.add(intersectGroup);
 
-                                largerGroup.substract(intersectGroup);
-                                smallerGroup.substract(intersectGroup);
-
-                                repeat = true;
-//                            largerGroup.removeGroup(intersectGroup);
-//                            largerGroup.setMinesNumber(largerGroup.getMinesNumber() - intersectGroup.getMinesNumber());
-//                            smallerGroup.removeGroup(intersectGroup);
-//                            smallerGroup.setMinesNumber(smallerGroup.getMinesNumber() - intersectGroup.getMinesNumber());
+                                largerGroup.subtract(intersectGroup);
+                                smallerGroup.subtract(intersectGroup);
                             }
                         } else {
                             if (!filteredGroupsList.contains(group)) filteredGroupsList.add(group);
@@ -228,7 +208,6 @@ public class Solver {
                         }
                     }
                 }
-            } while (repeat);
             List<Group> tempList = new ArrayList<>(filteredGroupsList);
             for (Group group : filteredGroupsList) {
                 if (group.size() == 0 && group.getMinesNumber() == 0) tempList.remove(group);
@@ -236,7 +215,7 @@ public class Solver {
             filteredGroupsList = tempList;
     }
 
-    public void openCells(List<Group> groupsList) {
+    private void openCells(List<Group> groupsList) {
         for (Group group : groupsList) {
             if (group.getMinesNumber() == 0) {
                 for (Cell cell : group.getMembers()) {
@@ -281,16 +260,13 @@ public class Solver {
         }
     }
 
-    public void correctProbabilities() {
+    private void correctProbabilities() {
         Map<Cell, Double> cellsMap = new HashMap<>();
         for (Group group : filteredGroupsList) {
             for (Cell cell : group.getMembers()) {
                 Double value = cellsMap.get(cell);
                 if (value == null) cellsMap.put(cell, (double) group.getMinesNumber() / group.size());
                 else {
-//                    double probability = calcProbability(cell);
-//                    cellsMap.put(cell, probability);
-
                     cellsMap.put(cell, Probability.calculate(value, (double) group.getMinesNumber() / group.size()));
                 }
             }
@@ -298,16 +274,13 @@ public class Solver {
 
         //корректировка вероятностей с учетом того, что
         //сумма вероятностей должна быть равна количеству мин в группе
-        boolean repeat;
-            do {
-                repeat = false;
                 for (Group group : filteredGroupsList) {
                     List<Double> probList = group.getProbabilities();
                     Double sum = 0.0;
                     for (Double prob : probList) sum += prob;
                     int mines = group.getMinesNumber();
                     if (Math.abs(sum - mines) > 1) {
-                        repeat = true;
+
 
                         Probability.correct(probList, mines);
 
@@ -317,7 +290,6 @@ public class Solver {
                         }
                     }
                 }
-            } while (repeat);
         for (Cell cell: cellsMap.keySet()){  // перестраховка
             if (cell.getProbability()> 0.99) cell.setProbability(0.99);
             if (cell.getProbability()< 0.0) cell.setProbability(0.0);

@@ -4,12 +4,12 @@ public class Mine {
     private int i;
     private int j;
 
-    public Mine(int i, int j) {
+    Mine(int i, int j) {
         this.i = i;
         this.j = j;
     }
 
-    public int getI() {
+    int getI() {
         return i;
     }
 
@@ -17,11 +17,11 @@ public class Mine {
         this.i = i;
     }
 
-    public int getJ() {
+    int getJ() {
         return j;
     }
 
-    public void setJ(int j) {
+    void setJ(int j) {
         this.j = j;
     }
 }
