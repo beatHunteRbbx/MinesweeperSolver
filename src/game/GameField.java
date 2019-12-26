@@ -1,4 +1,4 @@
-package sample;
+package game;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Cursor;
@@ -14,18 +14,19 @@ public class GameField {
     public int maxNumberOfMines;
     public int rows;
     public int columns;
-    double imageW = 50;
-    double imageH = 50;
 
-    public String[][] arrField;
+    //карта расставленных мин, содержащая нули и единицы, чтобы было удобно расчитывать
+    //количество мин рядом с ячейкой и присваивать вычисленное значение ячейке.
     public Integer[][] arrMines;
+
     public Cell[][] arrCells;
 
-    public List<Mine> listOfMines = new LinkedList<>();
 
-    public List<Cell> markedCellsList = new LinkedList<>();
-    public List<Cell> cellsWithMinesList = new LinkedList<>();
-    public List<Cell> closedCellsList = new LinkedList<>();
+    public List<Mine> listOfMines = new ArrayList<>();
+
+    public List<Cell> markedCellsList = new ArrayList<>();
+    public List<Cell> cellsWithMinesList = new ArrayList<>();
+    public List<Cell> closedCellsList = new ArrayList<>();
 
     GridPane gridPane;
 
@@ -33,24 +34,39 @@ public class GameField {
         createMines();
         buildField();
         calcMinesAround();
-        show(arrField);
+//        show(arrCells);
         run();
     }
     public GameField(int rows, int columns, int maxNumberOfMines) {
         this.rows = rows + 2;
         this.columns = columns + 2;
         this.maxNumberOfMines = maxNumberOfMines;
-        arrField = new String[this.rows][this.rows];
-        arrMines = new Integer[this.rows][this.rows];
-        arrCells = new Cell[this.rows][this.rows];
+        arrMines = new Integer[this.rows][this.columns];
+        arrCells = new Cell[this.rows][this.columns];
     }
 
     private void createMines() {
         int counter = 0;
         int allMinesCounter = 0;
         Random random = new Random();
-        for (int i = 1; i < rows - 1; i+=2) {
-            for (int j = 1; j < columns - 1; j+=2) {
+        for (int i = 1; i < (rows - 1) / 2; i+=random.nextInt((2 - 1) + 1) + 1) {
+            for (int j = 1; j < (columns - 1) / 2; j+=random.nextInt((2 - 1) + 1) + 1) {
+                int number = random.nextInt(2);
+                if (number == 1) {
+                    listOfMines.add(new Mine(i, j));
+                    counter++;
+                    allMinesCounter++;
+                }
+                if (allMinesCounter == maxNumberOfMines) return;
+                if (counter == columns / 2) {
+                    counter = 0;
+                    break;
+                }
+            }
+        }
+
+        for (int i = (rows - 1) / 2; i < rows - 1; i+=random.nextInt((2 - 1) + 1) + 1) {
+            for (int j = (columns - 1) / 2; j < columns - 1; j+=random.nextInt((2 - 1) + 1) + 1) {
                 int number = random.nextInt(2);
                 if (number == 1) {
                     listOfMines.add(new Mine(i, j));
@@ -66,7 +82,7 @@ public class GameField {
         }
     }
 
-    private void calcMinesAround() {
+    public void calcMinesAround() {
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
                 if (arrMines[i][j] == 0) {
@@ -86,13 +102,13 @@ public class GameField {
                             arrMines[i + 1][j] +
                             arrMines[i + 1][j - 1] +
                             arrMines[i][j - 1];
-                    arrField[i][j] = Integer.toString(numberOfMinesNearby);
+                    arrCells[i][j].setValue(Integer.toString(numberOfMinesNearby));
                     Cell cell = new Cell(i, j, Integer.toString(numberOfMinesNearby), false);
                     arrCells[i][j] = cell;
                     closedCellsList.add(cell);
                 }
                 else {
-                    arrField[i][j] = "*";
+                    arrCells[i][j].setValue("*");
                     Cell cell = new Cell(i, j, "*", true);
                     arrCells[i][j] = cell;
                     cellsWithMinesList.add(cell);
@@ -102,22 +118,23 @@ public class GameField {
         }
     }
 
-    private void show(Object[][] field) {
+    private void show(Cell[][] field) {
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
-                System.out.print(field[i][j] + " ");
+                System.out.print(field[i][j].getValue() + " ");
             }
             System.out.println();
         }
     }
 
-    private void buildField() {
+    public void buildField() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 arrMines[i][j] = 0;
+                arrCells[i][j] = new Cell(i, j, "0", false);
             }
         }
-        for (Mine mine : listOfMines) arrMines[mine.i][mine.j] = 1;
+        for (Mine mine : listOfMines) arrMines[mine.getI()][mine.getJ()] = 1;
     }
 
     public void draw(Pane playPane) {
@@ -127,71 +144,71 @@ public class GameField {
 
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
-                switch (arrField[i][j]) {
+                switch (arrCells[i][j].getValue()) {
                     case "*":
                         ImageView mineImageView = new ImageView(Images.MINE_IMAGE);
-                        mineImageView.setFitWidth(imageW);
-                        mineImageView.setFitHeight(imageH);
+                        mineImageView.setFitWidth(Images.imageW);
+                        mineImageView.setFitHeight(Images.imageH);
                         gridPane.add(mineImageView, j, i);
                         break;
                     case "0":
                         ImageView greyImageView = new ImageView(Images.GREY_IMAGE);
-                        greyImageView.setFitWidth(imageW);
-                        greyImageView.setFitHeight(imageH);
+                        greyImageView.setFitWidth(Images.imageW);
+                        greyImageView.setFitHeight(Images.imageH);
                         gridPane.add(greyImageView, j, i);
                         break;
                     case "1":
                         ImageView oneImageView = new ImageView(Images.ONE_IMAGE);
-                        oneImageView.setFitWidth(imageW);
-                        oneImageView.setFitHeight(imageH);
+                        oneImageView.setFitWidth(Images.imageW);
+                        oneImageView.setFitHeight(Images.imageH);
                         gridPane.add(oneImageView, j, i);
                         break;
                     case "2":
                         ImageView twoImageView = new ImageView(Images.TWO_IMAGE);
-                        twoImageView.setFitWidth(imageW);
-                        twoImageView.setFitHeight(imageH);
+                        twoImageView.setFitWidth(Images.imageW);
+                        twoImageView.setFitHeight(Images.imageH);
                         gridPane.add(twoImageView, j, i);
                         break;
                     case "3":
                         ImageView threeImageView = new ImageView(Images.THREE_IMAGE);
-                        threeImageView.setFitWidth(imageW);
-                        threeImageView.setFitHeight(imageH);
+                        threeImageView.setFitWidth(Images.imageW);
+                        threeImageView.setFitHeight(Images.imageH);
                         gridPane.add(threeImageView, j, i);
                         break;
                     case "4":
                         ImageView fourImageView = new ImageView(Images.FOUR_IMAGE);
-                        fourImageView.setFitWidth(imageW);
-                        fourImageView.setFitHeight(imageH);
+                        fourImageView.setFitWidth(Images.imageW);
+                        fourImageView.setFitHeight(Images.imageH);
                         gridPane.add(fourImageView, j, i);
                         break;
                     case "5":
                         ImageView fiveImageView = new ImageView(Images.FIVE_IMAGE);
-                        fiveImageView.setFitWidth(imageW);
-                        fiveImageView.setFitHeight(imageH);
+                        fiveImageView.setFitWidth(Images.imageW);
+                        fiveImageView.setFitHeight(Images.imageH);
                         gridPane.add(fiveImageView, j, i);
                         break;
                     case "6":
                         ImageView sixImageView = new ImageView(Images.SIX_IMAGE);
-                        sixImageView.setFitWidth(imageW);
-                        sixImageView.setFitHeight(imageH);
+                        sixImageView.setFitWidth(Images.imageW);
+                        sixImageView.setFitHeight(Images.imageH);
                         gridPane.add(sixImageView, j, i);
                         break;
                     case "7":
                         ImageView sevenImageView = new ImageView(Images.SEVEN_IMAGE);
-                        sevenImageView.setFitWidth(imageW);
-                        sevenImageView.setFitHeight(imageH);
+                        sevenImageView.setFitWidth(Images.imageW);
+                        sevenImageView.setFitHeight(Images.imageH);
                         gridPane.add(sevenImageView, j, i);
                         break;
                     case "8":
                         ImageView eightImageView = new ImageView(Images.EIGHT_IMAGE);
-                        eightImageView.setFitWidth(imageW);
-                        eightImageView.setFitHeight(imageH);
+                        eightImageView.setFitWidth(Images.imageW);
+                        eightImageView.setFitHeight(Images.imageH);
                         gridPane.add(eightImageView, j, i);
                         break;
                     case "9":
                         ImageView nineImageView = new ImageView(Images.NINE_IMAGE);
-                        nineImageView.setFitWidth(imageW);
-                        nineImageView.setFitHeight(imageH);
+                        nineImageView.setFitWidth(Images.imageW);
+                        nineImageView.setFitHeight(Images.imageH);
                         gridPane.add(nineImageView, j, i);
                         break;
                 }
@@ -202,38 +219,44 @@ public class GameField {
         playPane.getChildren().add(gridPane);
     }
 
-    private void clearCellsNearby(Cell cell) {
-        if (cell == null || cell.value == null) return;
-        if (cell.i < 0 || cell.i > rows - 1 || cell.j < 0 || cell.j > columns - 1) return;
-        if (cell.isOpened) return;
-        if (!cell.hasFlag) {
-            cell.camoView.setVisible(false);
-            cell.isOpened = true;
-        }
-        if (!cell.value.equals("0") || cell.hasMine || cell.hasFlag) return;
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                clearCellsNearby(arrCells[cell.i + i][cell.j + j]);
+    public void clearNeighboursCells(Cell cell) {
+        if (    !(cell.getI() < 1 || cell.getI() > rows - 2) ||
+                !(cell.getJ() < 1 || cell.getJ() > columns - 2)) {
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    Cell neighbour = arrCells[cell.getI() + i][cell.getJ() + j];
+                    if (neighbour == null || neighbour.getValue() == null) continue;
+                    if (    (neighbour.getI() < 1 || neighbour.getI() > rows - 2) ||
+                            (neighbour.getJ() < 1 || neighbour.getJ() > columns - 2)) continue;
+                    if (neighbour.isOpened()) continue;
+                    if (!neighbour.hasFlag()) {
+                        neighbour.getCamoView().setVisible(false);
+                        neighbour.setOpened(true);
+                        if (neighbour.getValue().equals("0")) {
+                            clearNeighboursCells(neighbour);
+                        }
+                    }
+                }
             }
         }
     }
 
-    private void run() {
+    public void run() {
         AnimationTimer animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 for (int i = 1; i < rows - 1; i++) {
                     for (int j = 1; j < columns - 1; j++) {
                         Cell cell = arrCells[i][j];
-                        if (!cell.camoView.isVisible()) {
+                        if (!cell.getCamoView().isVisible()) {
                             closedCellsList.remove(cell);
-                            clearCellsNearby(cell);
+                            if (cell.getValue().equals("0")) clearNeighboursCells(cell);
                         }
                     }
                 }
                 if (cellsWithMinesList.containsAll(closedCellsList)) {
                     for (Cell cell : cellsWithMinesList) {
-                        cell.flagView.setVisible(true);
+                        cell.getFlagView().setVisible(true);
 //                        victory();
                     }
                 }
@@ -256,42 +279,39 @@ public class GameField {
     public void startGameProcess() {
         for (int i = 1; i < rows - 1; i++) {
             for (int j = 1; j < columns - 1; j++) {
-                ImageView camoImageView = new ImageView(Images.CAMO_IMAGE);
-                ImageView flagImageView = new ImageView(Images.FLAG_IMAGE);
+                Cell currentCell = arrCells[i][j];
+                ImageView camoImageView = currentCell.getCamoView();
+                ImageView flagImageView = currentCell.getFlagView();
                 camoImageView.setCursor(Cursor.HAND);
-                camoImageView.setFitWidth(imageW);
-                camoImageView.setFitHeight(imageH);
-                flagImageView.setFitWidth(imageW);
-                flagImageView.setFitHeight(imageH);
+                camoImageView.setFitWidth(Images.imageW);
+                camoImageView.setFitHeight(Images.imageH);
+                flagImageView.setFitWidth(Images.imageW);
+                flagImageView.setFitHeight(Images.imageH);
                 flagImageView.setVisible(false);
                 gridPane.add(camoImageView, j, i);
                 gridPane.add(flagImageView, j, i);
-                Cell currentCell = arrCells[i][j];
-                currentCell.camoView = camoImageView;
-                currentCell.flagView = flagImageView;
                 camoImageView.setOnMouseClicked(event -> {
                     if (!flagImageView.isVisible()) {
                         if (event.getButton() == MouseButton.PRIMARY) {
-                            currentCell.camoView.setVisible(false);
-                            currentCell.isOpened = true;
-                            if (currentCell.hasMine) {
+                            currentCell.getCamoView().setVisible(false);
+                            if (currentCell.hasMine()) {
                                 for (Cell cell : cellsWithMinesList) {
-                                    cell.camoView.setVisible(false);
-                                    cell.isOpened = true;
+                                    cell.getCamoView().setVisible(false);
+                                    cell.setOpened(true);
                                 }
                                 lose();
                             }
                         }
                         if (event.getButton() == MouseButton.SECONDARY) {
                             if (flagImageView.isVisible()) {
-                                currentCell.hasFlag = false;
-                                currentCell.flagView.setVisible(false);
+                                currentCell.setFlag(false);
+                                currentCell.getFlagView().setVisible(false);
                                 flagImageView.setVisible(false);
                                 markedCellsList.remove(currentCell);
                             }
                             else {
-                                currentCell.hasFlag = true;
-                                currentCell.flagView.setVisible(true);
+                                currentCell.setFlag(true);
+                                currentCell.getFlagView().setVisible(true);
                                 flagImageView.setVisible(true);
                                 markedCellsList.add(currentCell);
                             }
@@ -300,8 +320,8 @@ public class GameField {
                 });
                 flagImageView.setOnMouseClicked(event -> {
                     if(event.getButton() == MouseButton.SECONDARY) {
-                        currentCell.hasFlag = false;
-                        currentCell.flagView.setVisible(false);
+                        currentCell.setFlag(false);
+                        currentCell.getFlagView().setVisible(false);
                         flagImageView.setVisible(false);
                         markedCellsList.remove(currentCell);
                     }
@@ -314,6 +334,13 @@ public class GameField {
         System.out.println("Вы проиграли");
         gridPane.setDisable(true);
         Main.solveButton.setDisable(true);
+        for (int i = 1; i < rows - 1; i++) {
+            for (int j = 1; j < columns - 1; j++) {
+                Cell currentCell = arrCells[i][j];
+                currentCell.getCamoView().setDisable(true);
+            }
+        }
+        Main.mainThread.interrupt();
     }
 
     public void victory() {
@@ -325,7 +352,7 @@ public class GameField {
         List<Cell> neighboursList = new ArrayList<>();
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
-                neighboursList.add(arrCells[cell.i + i][cell.j + j]);
+                neighboursList.add(arrCells[cell.getI() + i][cell.getJ() + j]);
             }
         }
         return neighboursList;

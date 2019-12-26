@@ -1,4 +1,4 @@
-package sample;
+package game;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -7,6 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Images {
+
+    public static final int imageW = 50;
+    public static final int imageH = 50;
 
     static Image MINE_IMAGE;
     static Image FLAG_IMAGE;
