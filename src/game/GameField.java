@@ -230,8 +230,7 @@ public class GameField {
                             (neighbour.getJ() < 1 || neighbour.getJ() > columns - 2)) continue;
                     if (neighbour.isOpened()) continue;
                     if (!neighbour.hasFlag()) {
-                        neighbour.getCamoView().setVisible(false);
-                        neighbour.setOpened(true);
+                        neighbour.open();
                         if (neighbour.getValue().equals("0")) {
                             clearNeighboursCells(neighbour);
                         }
@@ -296,22 +295,19 @@ public class GameField {
                             currentCell.getCamoView().setVisible(false);
                             if (currentCell.hasMine()) {
                                 for (Cell cell : cellsWithMinesList) {
-                                    cell.getCamoView().setVisible(false);
-                                    cell.setOpened(true);
+                                    cell.open();
                                 }
                                 lose();
                             }
                         }
                         if (event.getButton() == MouseButton.SECONDARY) {
                             if (flagImageView.isVisible()) {
-                                currentCell.setFlag(false);
-                                currentCell.getFlagView().setVisible(false);
+                                currentCell.removeFlag();
                                 flagImageView.setVisible(false);
                                 markedCellsList.remove(currentCell);
                             }
                             else {
-                                currentCell.setFlag(true);
-                                currentCell.getFlagView().setVisible(true);
+                                currentCell.setFlag();
                                 flagImageView.setVisible(true);
                                 markedCellsList.add(currentCell);
                             }
@@ -320,8 +316,7 @@ public class GameField {
                 });
                 flagImageView.setOnMouseClicked(event -> {
                     if(event.getButton() == MouseButton.SECONDARY) {
-                        currentCell.setFlag(false);
-                        currentCell.getFlagView().setVisible(false);
+                        currentCell.removeFlag();
                         flagImageView.setVisible(false);
                         markedCellsList.remove(currentCell);
                     }

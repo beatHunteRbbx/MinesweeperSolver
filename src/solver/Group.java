@@ -4,6 +4,7 @@ import game.Cell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Group {
 
@@ -77,5 +78,18 @@ public class Group {
         this.minesNumber -= group.minesNumber;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return minesNumber == group.minesNumber &&
+                Objects.equals(members, group.members) &&
+                group.members.containsAll(this.members);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(members, minesNumber);
+    }
 }

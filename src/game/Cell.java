@@ -28,6 +28,21 @@ public class Cell {
 
     }
 
+    public void open() {
+        this.camoView.setVisible(false);
+        this.isOpened = true;
+    }
+
+    public void setFlag() {
+        this.hasFlag = true;
+        this.flagView.setVisible(true);
+    }
+
+    public void removeFlag() {
+        this.hasFlag = false;
+        this.flagView.setVisible(false);
+    }
+
     public int getI() {
         return i;
     }
@@ -56,16 +71,8 @@ public class Cell {
         return isOpened;
     }
 
-    public void setOpened(boolean opened) {
-        isOpened = opened;
-    }
-
     public boolean hasFlag() {
         return hasFlag;
-    }
-
-    public void setFlag(boolean hasFlag) {
-        this.hasFlag = hasFlag;
     }
 
     public boolean hasMine() {
