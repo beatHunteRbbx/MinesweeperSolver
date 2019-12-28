@@ -8,8 +8,8 @@ import java.io.FileNotFoundException;
 
 public class Images {
 
-    public static final int imageW = 50;
-    public static final int imageH = 50;
+    public static final int imageW = 30;
+    public static final int imageH = 30;
 
     static Image MINE_IMAGE;
     static Image FLAG_IMAGE;

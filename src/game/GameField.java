@@ -17,7 +17,7 @@ public class GameField {
 
     //карта расставленных мин, содержащая нули и единицы, чтобы было удобно расчитывать
     //количество мин рядом с ячейкой и присваивать вычисленное значение ячейке.
-    private Integer[][] arrMines;
+    private int[][] arrMines;
 
     public Cell[][] arrCells;
 
@@ -41,43 +41,20 @@ public class GameField {
         this.rows = rows + 2;
         this.columns = columns + 2;
         this.maxNumberOfMines = maxNumberOfMines;
-        arrMines = new Integer[this.rows][this.columns];
+        arrMines = new int[this.rows][this.columns];
         arrCells = new Cell[this.rows][this.columns];
     }
 
     private void createMines() {
-        int counter = 0;
-        int allMinesCounter = 0;
+        int allMinesCounter = maxNumberOfMines;
         Random random = new Random();
-        for (int i = 1; i < (rows - 1) / 2; i+=random.nextInt((2 - 1) + 1) + 1) {
-            for (int j = 1; j < (columns - 1) / 2; j+=random.nextInt((2 - 1) + 1) + 1) {
-                int number = random.nextInt(2);
-                if (number == 1) {
-                    listOfMines.add(new Mine(i, j));
-                    counter++;
-                    allMinesCounter++;
-                }
-                if (allMinesCounter == maxNumberOfMines) return;
-                if (counter == columns / 2) {
-                    counter = 0;
-                    break;
-                }
-            }
-        }
 
-        for (int i = (rows - 1) / 2; i < rows - 1; i+=random.nextInt((2 - 1) + 1) + 1) {
-            for (int j = (columns - 1) / 2; j < columns - 1; j+=random.nextInt((2 - 1) + 1) + 1) {
-                int number = random.nextInt(2);
-                if (number == 1) {
-                    listOfMines.add(new Mine(i, j));
-                    counter++;
-                    allMinesCounter++;
-                }
-                if (allMinesCounter == maxNumberOfMines) return;
-                if (counter == columns / 2) {
-                    counter = 0;
-                    break;
-                }
+        while (allMinesCounter > 0) {
+            int rndI = random.nextInt((rows - 2 - 1) + 1) + 1;
+            int rndJ = random.nextInt((columns - 2 - 1) + 1) + 1;
+            if (!(arrMines[rndI][rndJ] == 1)) {
+                listOfMines.add(new Mine(rndI, rndJ));
+                allMinesCounter--;
             }
         }
     }

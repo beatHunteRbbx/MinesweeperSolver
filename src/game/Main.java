@@ -33,9 +33,9 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 
-        int rows = 10;
-        int columns = 10;
-        int maxNumberOfMines = (rows + columns) / 2;
+        int rows = 16;
+        int columns = 30;
+        int maxNumberOfMines = 99;
 
 
         Runnable mainTask = new Runnable() {
